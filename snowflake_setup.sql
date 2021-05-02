@@ -1,16 +1,15 @@
-create database raw;
-create schema raw.jaffle_shop;
-use warehouse xsmall_wh;
+create database dbt_raw;
+create schema dbt_raw.jaffle_shop;
+use warehouse load_wh;
 
--- create this one directly in the schema
-create or replace table raw.jaffle_shop.customers
+create or replace table dbt_raw.jaffle_shop.customers
 (
   id integer,
   first_name varchar,
   last_name varchar
 );
 
-copy into raw.jaffle_shop.customers (id, first_name, last_name)
+copy into dbt_raw.jaffle_shop.customers (id, first_name, last_name)
     from 's3://dbt-tutorial-public/jaffle_shop_customers.csv'
         file_format = (
             type = 'CSV'
@@ -19,7 +18,7 @@ copy into raw.jaffle_shop.customers (id, first_name, last_name)
         )
 ;
 
-create or replace table raw.jaffle_shop.orders
+create or replace table dbt_raw.jaffle_shop.orders
 (
   id integer,
   user_id integer,
@@ -28,7 +27,7 @@ create or replace table raw.jaffle_shop.orders
   _etl_loaded_at timestamp default current_timestamp
 );
 
-copy into raw.jaffle_shop.orders (id, user_id, order_date, status)
+copy into dbt_raw.jaffle_shop.orders (id, user_id, order_date, status)
     from 's3://dbt-tutorial-public/jaffle_shop_orders.csv'
         file_format = (
             type = 'CSV'
@@ -37,9 +36,9 @@ copy into raw.jaffle_shop.orders (id, user_id, order_date, status)
         )
 ;
 
-create schema raw.stripe;
+create schema dbt_raw.stripe;
 
-create or replace table raw.stripe.payment (
+create or replace table dbt_raw.stripe.payment (
   id integer,
   orderid integer,
   paymentmethod varchar,
@@ -49,7 +48,7 @@ create or replace table raw.stripe.payment (
   _batched_at timestamp default current_timestamp
 );
 
-copy into raw.stripe.payment (id, orderid, paymentmethod, status, amount, created)
+copy into dbt_raw.stripe.payment (id, orderid, paymentmethod, status, amount, created)
 from 's3://dbt-tutorial-public/stripe_payments.csv'
     file_format = (
         type = 'CSV'
